@@ -3,10 +3,16 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 
-const inter = Inter({ subsets: ["latin"] });
+// Add fallback fonts and swap display
+const inter = Inter({ 
+  subsets: ["latin"],
+  display: 'swap',
+  fallback: ['system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Arial', 'sans-serif'],
+  variable: '--font-inter',
+});
 
 export const metadata: Metadata = {
-  title: "Jenga Tech ",
+  title: "Jenga Tech",
   description: "World Leading Tech Institute",
 };
 
