@@ -140,13 +140,6 @@ const Navbar = () => {
                 </Link>
               </NavigationMenuItem>
               
-              <NavigationMenuItem>
-                <Link href="/admin" legacyBehavior passHref>
-                  <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "cursor-pointer bg-black text-gray-300 hover:bg-gray-900 hover:text-white focus:bg-gray-900 focus:text-white")}>
-                    Admin
-                  </NavigationMenuLink>
-                </Link>
-              </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
           
@@ -199,7 +192,7 @@ const Navbar = () => {
                    <div className="flex flex-col space-y-3 pl-2">
                       <Link href="/about" className="text-gray-300 hover:text-white">About Us</Link>
                       <Link href="/blog" className="text-gray-300 hover:text-white">Blog</Link>
-                      <Link href="/admin" className="text-gray-300 hover:text-white">Admin Portal</Link>
+                    
                    </div>
                 </div>
 

@@ -15,13 +15,14 @@ export function HeroSection() {
           Bridging Innovation & Education
         </Badge>
         <h1 className="text-4xl font-extrabold tracking-tight sm:text-6xl xl:text-7xl mb-6">
-          We Build Technology. <br className="hidden md:block" />
-          <span className="text-orange-600">We Build Talent.</span>
+          Build Solutions. <br className="hidden md:block" />
+          <span className="text-orange-600">Transform Tomorrow.</span>
         </h1>
         <p className="max-w-2xl mx-auto text-lg md:text-xl text-gray-400 mb-10">
-          Jenga Tech is a premier institute offering top-tier{" "}
-          <strong>software solutions for businesses</strong> and immersive{" "}
-          <strong>tech education for future leaders</strong>.
+          At Jenga Worldwide, we empower businesses with cutting-edge software <br />
+
+          <strong> We drive  secure, innovative growth for global corporate partners.</strong> 
+
         </p>
 
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
@@ -30,7 +31,7 @@ export function HeroSection() {
               size="lg"
               className="bg-orange-600 hover:bg-orange-700 text-white min-w-[180px] h-14 text-lg"
             >
-              <Briefcase className="mr-2 h-5 w-5" /> Hire Jenga Solutions
+              <Briefcase className="mr-2 h-5 w-5" /> Jenga Business 
             </Button>
           </Link>
           <Link href="/academy">

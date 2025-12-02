@@ -71,11 +71,7 @@ const Footer = () => {
                   Blog
                 </Link>
               </li>
-              <li>
-                <Link href="/admin" className="hover:text-white">
-                  Admin Login
-                </Link>
-              </li>
+             
             </ul>
           </div>
         </div>
