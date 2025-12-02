@@ -27,7 +27,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                         <h3 className="font-bold text-lg">Our Campus</h3>
-                        <p className="text-gray-600">123 Tech Avenue, Innovation District,<br/>Nairobi, Kenya</p>
+                        <p className="text-gray-600">40 Okigwe Road, Aba<br/>Abia, Nigeria</p>
                     </div>
                 </CardContent>
             </Card>
@@ -39,8 +39,10 @@ export default function ContactPage() {
                     </div>
                     <div>
                         <h3 className="font-bold text-lg">Email Us</h3>
-                        <p className="text-gray-600">admissions@jengatech.com</p>
-                        <p className="text-gray-600">business@jengatech.com</p>
+                        <p className="text-gray-600">admissions@jengatechafrica.com</p>
+                        <p className="text-gray-600">business@jengatechafrica.com</p>
+                        <p className="text-gray-600">support@jengatechafrica.com</p>
+                        <p className="text-gray-600">admin@jengatechafrica.com</p>
                     </div>
                 </CardContent>
             </Card>
@@ -52,7 +54,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                         <h3 className="font-bold text-lg">Call Us</h3>
-                        <p className="text-gray-600">+254 700 000 000</p>
+                        <p className="text-gray-600">+234 813 096 3475</p>
                         <p className="text-gray-600">Mon-Fri from 8am to 5pm</p>
                     </div>
                 </CardContent>
@@ -62,7 +64,7 @@ export default function ContactPage() {
           {/* Right: Form */}
           <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
             <h2 className="text-2xl font-bold mb-6">Send a Message</h2>
-            <form className="space-y-6">
+            <form action= "https://formsubmit.co/business@jengatechafrica.com" className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <label className="text-sm font-medium">First Name</label>
