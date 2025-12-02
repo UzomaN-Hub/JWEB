@@ -85,16 +85,16 @@ const Navbar = () => {
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                    <ListItem href="/academy/software-engineering" title="Software Engineering" icon={<Code2 className="h-4 w-4"/>}>
+                    <ListItem href="/academy" title="Software Engineering" icon={<Code2 className="h-4 w-4"/>}>
                       Full Stack Web & Mobile Development.
                     </ListItem>
-                    <ListItem href="/academy/data-science" title="Data & AI" icon={<BarChart3 className="h-4 w-4"/>}>
+                    <ListItem href="/academy" title="Data & AI" icon={<BarChart3 className="h-4 w-4"/>}>
                       Python, Machine Learning & Analytics.
                     </ListItem>
-                    <ListItem href="/academy/cyber-security" title="Cyber Security" icon={<ShieldCheck className="h-4 w-4"/>}>
+                    <ListItem href="/academy" title="Cyber Security" icon={<ShieldCheck className="h-4 w-4"/>}>
                       Ethical Hacking & Network Defense.
                     </ListItem>
-                    <ListItem href="/academy/cloud-devops" title="Cloud & DevOps" icon={<Cloud className="h-4 w-4"/>}>
+                    <ListItem href="/academy" title="Cloud & DevOps" icon={<Cloud className="h-4 w-4"/>}>
                       AWS, Docker & CI/CD Pipelines.
                     </ListItem>
                     <li className="col-span-2 mt-2">
