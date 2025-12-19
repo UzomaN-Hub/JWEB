@@ -67,7 +67,7 @@ export default function AboutPage() {
                 <div className="h-64 bg-gray-300 w-full object-cover"></div>
                 <CardContent className="pt-4 text-center">
                   <h3 className="font-bold text-lg">Team Member {member}</h3>
-                  <p className="text-sm text-orange-600">Senior Engineer</p>
+                  <p className="text-sm text-orange-600">Senior Engineers</p>
                 </CardContent>
               </Card>
             ))}
