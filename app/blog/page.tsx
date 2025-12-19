@@ -1,170 +1,262 @@
-import Link from 'next/link';
-import Image from 'next/image'; // Assuming you might use Next.js Image optimization later
+"use client";
 
-// 1. Define the shape of a Blog Post
-interface BlogPost {
-  id: string;
-  slug: string;
-  title: string;
-  excerpt: string;
-  date: string;
-  author: string;
-  category: 'Business' | 'Education'; // Strict typing for your two niches
-  readTime: string;
-  imageUrl: string; 
-}
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { articleApi } from "@/lib/api";
+import { Article } from "@/types";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import Navbar from "@/components/layout/navbar";
+import { 
+  Search, 
+  Loader2, 
+  Calendar,
+  Code,
+  ArrowRight,
+  Filter
+} from "lucide-react";
+import { format } from "date-fns";
+import { motion } from "framer-motion";
 
-// 2. Mock Data Fetching Function
-async function getBlogPosts(): Promise<BlogPost[]> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 100));
+export default function BlogPage() {
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [filteredArticles, setFilteredArticles] = useState<Article[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  return [
-    {
-      id: '1',
-      slug: 'future-of-corporate-upskilling',
-      title: 'The Future of Corporate Upskilling in 2024',
-      excerpt: 'How leading companies are bridging the skills gap through hybrid education models and continuous learning platforms.',
-      date: 'Nov 12, 2023',
-      author: 'Dr. Sarah Mitchell',
-      category: 'Education',
-      readTime: '5 min read',
-      imageUrl: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=800',
-    },
-    {
-      id: '2',
-      slug: 'strategic-leadership-digital-age',
-      title: 'Strategic Leadership in the Digital Age',
-      excerpt: 'Navigating market volatility requires a new set of leadership tools. We explore the 5 pillars of modern management.',
-      date: 'Nov 08, 2023',
-      author: 'James Sterling',
-      category: 'Business',
-      readTime: '7 min read',
-      imageUrl: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=800',
-    },
-    {
-      id: '3',
-      slug: 'edtech-integration-strategies',
-      title: 'Integrating EdTech: A Guide for Institutions',
-      excerpt: 'Moving beyond Zoom: How to implement learning management systems that actually engage students and employees.',
-      date: 'Oct 28, 2023',
-      author: 'Elena Rodriguez',
-      category: 'Education',
-      readTime: '6 min read',
-      imageUrl: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=800',
-    },
-    {
-      id: '4',
-      slug: 'optimizing-supply-chains',
-      title: 'Optimizing Supply Chains for Sustainability',
-      excerpt: 'Why green business logistics are not just good for the planet, but essential for long-term profitability.',
-      date: 'Oct 15, 2023',
-      author: 'Michael Chen',
-      category: 'Business',
-      readTime: '4 min read',
-      imageUrl: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=800',
-    },
-  ];
-}
+  // Helper function to build image URL
+  const getImageUrl = (imagePath: string | null | undefined): string | null => {
+    if (!imagePath) return null;
+    
+    // If it's already a full URL, return it
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return imagePath;
+    }
+    
+    // Use BACKEND_URL for image paths
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:8000';
+    
+    if (!backendUrl) {
+      console.warn('No backend URL configured');
+      return null;
+    }
+    
+    // Ensure the path starts with /
+    const path = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+    
+    // Remove trailing slash from backend URL if present
+    const cleanBackendUrl = backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl;
+    
+    return `${cleanBackendUrl}${path}`;
+  };
 
-// Helper component for Category Badges
-const CategoryBadge = ({ category }: { category: string }) => {
-  const isBusiness = category === 'Business';
-  // Blue for Business, Emerald (Green) for Education
-  const colorClass = isBusiness 
-    ? 'bg-blue-100 text-blue-800 border-blue-200' 
-    : 'bg-emerald-100 text-emerald-800 border-emerald-200';
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        const data = await articleApi.getArticles({ published_only: true });
+        setArticles(data);
+        setFilteredArticles(data);
+      } catch (error) {
+        console.error("Error fetching articles:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchArticles();
+  }, []);
+
+  // Search filter
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredArticles(articles);
+    } else {
+      const query = searchQuery.toLowerCase();
+      setFilteredArticles(
+        articles.filter(
+          (article) =>
+            article.title.toLowerCase().includes(query) ||
+            article.excerpt?.toLowerCase().includes(query)
+        )
+      );
+    }
+  }, [searchQuery, articles]);
 
   return (
-    <span className={`text-xs font-semibold px-2.5 py-0.5 rounded border ${colorClass}`}>
-      {category}
-    </span>
-  );
-};
+    <main className="min-h-screen bg-black">
+      <Navbar />
 
-// 3. The Page Component
-export default async function BlogPage() {
-  const posts = await getBlogPosts();
+      {/* Hero Section */}
+      <section className="bg-gradient-to-r from-orange-600 to-orange-700 py-20">
+        <div className="container mx-auto px-4">
+          <motion.div
+            className="text-center max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              Tech Insights & Innovation
+            </h1>
+            <p className="text-xl text-orange-100 mb-8">
+              Explore the latest in technology, development trends, and digital solutions to power your business forward
+            </p>
 
-  return (
-    <div className="min-h-screen bg-gray-50 font-sans">
-      
-      {/* Hero / Header Section */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-4 py-16 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
-            Insights & Intelligence
-          </h1>
-          <p className="max-w-2xl mx-auto text-xl text-slate-600">
-            Expert analysis on the convergence of 
-            <span className="text-blue-600 font-semibold"> Business Strategy</span> and 
-            <span className="text-emerald-600 font-semibold"> Educational Innovation</span>.
-          </p>
+            {/* Search Bar */}
+            <div className="relative max-w-2xl mx-auto">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Input
+                type="search"
+                placeholder="Search articles..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-12 h-14 text-lg bg-white"
+              />
+            </div>
+          </motion.div>
         </div>
-      </div>
+      </section>
 
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        {/* Grid of Posts */}
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post) => (
-            <article 
-              key={post.id} 
-              className="flex flex-col bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group"
-            >
-              {/* Image Section */}
-              <div className="h-48 overflow-hidden relative bg-gray-200">
-                {/* Use Next/Image in production. Using standard img for this snippet. */}
-                <img 
-                  src={post.imageUrl} 
-                  alt={post.title}
-                  className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-                />
-              </div>
+      {/* Stats */}
+      <section className="container mx-auto px-4 -mt-10">
+        <div className="bg-gray-900 border border-gray-800 rounded-xl shadow-lg p-6 grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="text-center">
+            <p className="text-3xl font-bold text-orange-600">{articles.length}</p>
+            <p className="text-sm text-gray-400">Total Articles</p>
+          </div>
+          <div className="text-center">
+            <p className="text-3xl font-bold text-orange-600">15+</p>
+            <p className="text-sm text-gray-400">Tech Experts</p>
+          </div>
+          <div className="text-center">
+            <p className="text-3xl font-bold text-orange-600">100K+</p>
+            <p className="text-sm text-gray-400">Monthly Readers</p>
+          </div>
+          <div className="text-center">
+            <p className="text-3xl font-bold text-orange-600">5★</p>
+            <p className="text-sm text-gray-400">Average Rating</p>
+          </div>
+        </div>
+      </section>
 
-              <div className="p-6 flex flex-col flex-grow">
-                {/* Meta: Category & Date */}
-                <div className="flex items-center justify-between mb-4">
-                  <CategoryBadge category={post.category} />
-                  <span className="text-sm text-slate-500 flex items-center gap-1">
-                    {/* Simple Clock Icon SVG */}
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    {post.readTime}
-                  </span>
-                </div>
-
-                {/* Title */}
-                <Link href={`/blog/${post.slug}`} className="block group-hover:text-blue-600 transition-colors">
-                  <h2 className="text-xl font-bold text-slate-900 mb-3 leading-snug">
-                    {post.title}
-                  </h2>
-                </Link>
-
-                {/* Excerpt */}
-                <p className="text-slate-600 mb-6 text-sm leading-relaxed flex-grow">
-                  {post.excerpt}
+      {/* Articles Grid */}
+      <section className="container mx-auto px-4 py-16">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-10 h-10 text-orange-600 animate-spin" />
+          </div>
+        ) : filteredArticles.length === 0 ? (
+          <div className="text-center py-20">
+            <Code className="w-16 h-16 text-gray-700 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-white mb-2">
+              {searchQuery ? "No articles found" : "No articles published yet"}
+            </h3>
+            <p className="text-gray-400">
+              {searchQuery ? "Try a different search term" : "Check back soon for new tech content"}
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl font-bold text-white">
+                  {searchQuery ? `Search Results (${filteredArticles.length})` : "All Articles"}
+                </h2>
+                <p className="text-gray-400 mt-1">
+                  Discover technology insights and development best practices
                 </p>
-
-                {/* Footer: Author & Date */}
-                <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
-                  <div className="flex flex-col">
-                    <span className="text-sm font-semibold text-slate-900">{post.author}</span>
-                    <span className="text-xs text-slate-500">{post.date}</span>
-                  </div>
-                  
-                  <Link 
-                    href={`/blog/${post.slug}`} 
-                    className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
-                  >
-                    Read Article 
-                    <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                  </Link>
-                </div>
               </div>
-            </article>
-          ))}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredArticles.map((article, index) => {
+                const imageUrl = getImageUrl(article.featured_image);
+                
+                return (
+                  <motion.div
+                    key={article.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <Link href={`/articles/${article.slug}`}>
+                      <Card className="h-full bg-gray-900 border-gray-800 hover:border-orange-600 hover:shadow-2xl hover:shadow-orange-600/20 transition-all duration-300 cursor-pointer overflow-hidden group">
+                        {/* Image */}
+                        <div className="h-56 relative bg-gradient-to-br from-orange-600 to-orange-700 overflow-hidden">
+                          {imageUrl ? (
+                            <Image
+                              src={imageUrl}
+                              alt={article.title}
+                              fill
+                              className="object-cover group-hover:scale-110 transition-transform duration-300"
+                              unoptimized
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Code className="w-20 h-20 text-white/30" />
+                            </div>
+                          )}
+                        </div>
+
+                        <CardHeader>
+                          <div className="flex items-center justify-between mb-3">
+                            <Badge className="bg-orange-600/20 text-orange-400 hover:bg-orange-600/30 border-orange-600/50">
+                              Technology
+                            </Badge>
+                            <div className="flex items-center gap-1 text-sm text-gray-500">
+                              <Calendar className="w-4 h-4" />
+                              <span>{format(new Date(article.created_at), "MMM dd")}</span>
+                            </div>
+                          </div>
+
+                          <CardTitle className="text-xl text-white group-hover:text-orange-600 transition-colors line-clamp-2">
+                            {article.title}
+                          </CardTitle>
+
+                          {article.excerpt && (
+                            <CardDescription className="line-clamp-3 mt-2 text-gray-400">
+                              {article.excerpt}
+                            </CardDescription>
+                          )}
+                        </CardHeader>
+
+                        <CardFooter className="flex items-center justify-between">
+                          <span className="text-sm text-gray-500">5 min read</span>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-orange-600 hover:text-orange-500 hover:bg-orange-600/10 group-hover:translate-x-1 transition-transform"
+                          >
+                            Read More
+                            <ArrowRight className="w-4 h-4 ml-1" />
+                          </Button>
+                        </CardFooter>
+                      </Card>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </section>
+
+      {/* CTA Section */}
+      <section className="bg-gradient-to-r from-orange-600 to-orange-700 py-16">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Stay Updated with Tech Trends
+          </h2>
+          <p className="text-orange-100 text-lg mb-6">
+            Subscribe to our newsletter for weekly technology insights and innovation updates
+          </p>
+          <Button size="lg" className="bg-white text-orange-700 hover:bg-gray-100">
+            Subscribe Now
+          </Button>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

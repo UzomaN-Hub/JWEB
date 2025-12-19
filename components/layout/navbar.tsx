@@ -133,7 +133,7 @@ const Navbar = () => {
 
               {/* Simple Links */}
               <NavigationMenuItem>
-                <Link href="/blog" legacyBehavior passHref>
+                <Link href="/blog">
                   <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "cursor-pointer bg-black text-gray-300 hover:bg-gray-900 hover:text-white focus:bg-gray-900 focus:text-white")}>
                     Blog
                   </NavigationMenuLink>
